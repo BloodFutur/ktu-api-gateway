@@ -189,6 +189,7 @@ const seedDB = async () => {
 // Seed and close connection
 seedDB().then(() => {
     console.log('Database seeded');
+    console.log('Seeded data:', seedStudents, seedEnrollments);
     mongoose.connection.close()
     .then(() => {
         console.log('Connection closed');
