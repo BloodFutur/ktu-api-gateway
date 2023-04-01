@@ -1,0 +1,76 @@
+version: '3.4'
+services:
+
+
+  studentapi:
+    container_name: studentapi
+    image: studentapi
+    restart: always
+    build: 
+      context: studentapi
+      dockerfile: ../studentapi/Dockerfile
+    ports:
+      - ${STUDENTAPI_PORT}:${STUDENTAPI_PORT}
+    expose:
+      - ${STUDENTAPI_PORT}
+    environment:
+      - PORT=${STUDENTAPI_PORT}
+      - MONGODOCKER_STRING=${STUDENTAPI_MONGODOCKER_STRING}
+      - MONGO_STRING=${STUDENTAPI_MONGO_STRING}
+    links:
+      - mongodb
+    command: bash -c "npm run seed && npm run start"
+    networks:
+      - api-gateway-network
+  
+  courseapi:
+    container_name: courseapi
+    image: courseapi
+    restart: always
+    build: 
+      context: courseapi
+      dockerfile: ../courseapi/Dockerfile
+    ports:
+      - ${COURSEAPI_PORT}:${COURSEAPI_PORT}
+    expose:
+      - ${COURSEAPI_PORT}
+    environment:
+      - PORT=${COURSEAPI_PORT}
+      - MONGODOCKER_STRING=${COURSEAPI_MONGODOCKER_STRING}
+      - MONGO_STRING=${COURSEAPI_MONGO_STRING}
+    links:
+      - mongodb
+    command: bash -c "npm run seed && npm run start"
+    networks:
+      - api-gateway-network
+
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./data:/data/db
+    networks:
+      - api-gateway-network
+
+  api-gateway:
+    container_name: api-gateway
+    image: api-gateway
+    restart: always
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+    links:
+      - courseapi
+      - studentapi
+    command: bash -c "npm run start"
+    networks:
+      - api-gateway-network
+
+      
+
+networks:
+  api-gateway-network:
+    driver: bridge

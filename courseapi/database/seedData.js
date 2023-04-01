@@ -7,6 +7,8 @@ const Course = require('../models/course');
 
 // Connect to MongoDB
 const mongoString = process.env.MONGO_STRING;
+console.log('Connecting to database');
+console.log('MongoDB connection string: ', mongoString);
 mongoose.connect(mongoString, 
 { 
     useNewUrlParser: true,
@@ -86,6 +88,7 @@ const seedDB = async () => {
     await Course.deleteMany({});
     await Course.insertMany(seedCourses);
 };
+
 
 // Seed and close connection
 seedDB().then(() => {
